@@ -11,7 +11,7 @@ def read_file():
     ruta_archivo = sys.argv[1]
     f = open (ruta_archivo,'r')
     lineas = f.readlines()
-    datos = [0 for x in range(100)]
+    datos = [0 for x in range(int(sys.argv[2]))]
     for i in range(0, len(lineas)):
         linea = lineas[i].replace('\n','').split(sep=' ')
         var4 = 'NULL'
