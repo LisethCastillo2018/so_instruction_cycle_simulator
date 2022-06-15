@@ -4,8 +4,7 @@ SISTEMAS OPERATIVOS
 ESTUDIANTE:
 LISETH DAYANA CASTILLO QUIÑONES, CÓD. 1843187
 """
-import sys
-from utils.file import read_file
+from utils.utils import read_input
 
 
 def get_instrucion():
@@ -93,7 +92,7 @@ def execute_control_unit():
                 print('MAR: ', mar)
             elif 'D' in icr['var1'] and icr['var1'] not in ['MDR', 'UC']:
                 position = int(icr['var1'].replace("D",""))
-                print(f'D{position}:', data[position])
+                print(data[position])
 
 
 if __name__ == '__main__':
@@ -104,8 +103,10 @@ if __name__ == '__main__':
     INSTRUCTION_SET = 'SET'
     INSTRUCTION_SHOW = 'SHW'
 
+    INICIO_INSTRUCCIONES = 100
+
     # Leer el archivo con las instruciones
-    data = read_file()
+    data = read_input(INICIO_INSTRUCCIONES)
 
     palabras_instruciones = [
         INSTRUCTION_LOAD, 
@@ -115,7 +116,7 @@ if __name__ == '__main__':
         INSTRUCTION_SHOW
     ]
 
-    pc = int(sys.argv[2])
+    pc = INICIO_INSTRUCCIONES
     icr = None
     mar = pc
     acumulador = 0

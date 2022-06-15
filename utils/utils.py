@@ -7,11 +7,23 @@ LISETH DAYANA CASTILLO QUIÑONES, CÓD. 1843187
 import sys
 
 
-def read_file():
+def read_file(inicio_instrucciones):
     ruta_archivo = sys.argv[1]
     f = open (ruta_archivo,'r')
-    lineas = f.readlines()
-    datos = [0 for x in range(int(sys.argv[2]))]
+    datos = procesar_lineas(f.readlines(), inicio_instrucciones)
+    f.close()
+    return datos
+
+
+def read_input(inicio_instrucciones):
+    entrada = input("Ingrese instrucciones: ")
+    lineas = entrada.split(",")
+    datos = procesar_lineas(lineas, inicio_instrucciones)
+    return datos
+
+
+def procesar_lineas(lineas, inicio_instrucciones):
+    datos = [0 for x in range(inicio_instrucciones)]
     for i in range(0, len(lineas)):
         linea = lineas[i].replace('\n','').split(sep=' ')
         var4 = 'NULL'
@@ -24,7 +36,4 @@ def read_file():
             'var3': linea[3],
             'var4': var4,
         })
-    f.close()
-    # print(f'Se lee archivo')
     return datos
-
