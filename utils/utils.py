@@ -16,8 +16,12 @@ def read_file(inicio_instrucciones):
 
 
 def read_input(inicio_instrucciones):
-    entrada = input("Ingrese instrucciones: ")
-    lineas = entrada.split(",")
+    instruccion = ""
+    lineas = []
+    while instruccion != "END":
+        entrada = input("Ingrese instruccion: ")
+        instruccion = str(entrada.split()[0]).upper()
+        lineas.append(entrada)
     datos = procesar_lineas(lineas, inicio_instrucciones)
     return datos
 
