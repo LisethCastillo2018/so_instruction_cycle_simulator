@@ -85,12 +85,16 @@ def execute_control_unit():
         elif icr['word'] in [INSTRUCTION_LOAD, INSTRUCTION_STORE]:
             set_mar()
         elif icr['word'] == INSTRUCTION_SHOW:
-            if icr['var1']  == 'ACC':
-                return acumulador
-            elif icr['var1'] == 'ICR':
-                return icr
-            elif icr['var1'] == 'MAR':
-                return mar
+            
+            dict_show = {
+                'ACC': acumulador,
+                'ICR': icr,
+                'MAR': mar,
+            }
+            value_show = dict_show.get(icr['var1'], None)
+
+            if value_show is not None:
+                return value_show
             elif 'D' in icr['var1'] and icr['var1'] not in ['MDR', 'UC']:
                 position = int(icr['var1'].replace("D",""))
                 return data[position]

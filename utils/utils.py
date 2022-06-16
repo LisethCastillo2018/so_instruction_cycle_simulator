@@ -9,7 +9,7 @@ import sys
 
 def read_file(inicio_instrucciones):
     ruta_archivo = sys.argv[1]
-    f = open (ruta_archivo,'r')
+    f = open(ruta_archivo,'r')
     datos = procesar_lineas(f.readlines(), inicio_instrucciones)
     f.close()
     return datos
