@@ -5,7 +5,7 @@ ESTUDIANTE:
 LISETH DAYANA CASTILLO QUIÑONES, CÓD. 1843187
 """
 import sys
-from utils.file import read_file
+from utils.utils import read_file, read_input
 
 
 def get_instrucion():
@@ -86,14 +86,14 @@ def execute_control_unit():
             set_mar()
         elif icr['word'] == INSTRUCTION_SHOW:
             if icr['var1']  == 'ACC':
-                print('ACUMULADOR: ', acumulador)
+                return acumulador
             elif icr['var1'] == 'ICR':
-                print('ICR: ', icr)
+                return icr
             elif icr['var1'] == 'MAR':
-                print('MAR: ', mar)
+                return mar
             elif 'D' in icr['var1'] and icr['var1'] not in ['MDR', 'UC']:
                 position = int(icr['var1'].replace("D",""))
-                print(f'D{position}:', data[position])
+                return data[position]
 
 
 if __name__ == '__main__':
@@ -104,8 +104,13 @@ if __name__ == '__main__':
     INSTRUCTION_SET = 'SET'
     INSTRUCTION_SHOW = 'SHW'
 
+    INICIO_INSTRUCCIONES = 1000
+
     # Leer el archivo con las instruciones
-    data = read_file()
+    if len(sys.argv) > 1:
+        data = read_file(INICIO_INSTRUCCIONES)
+    else:
+        data = read_input(INICIO_INSTRUCCIONES)
 
     palabras_instruciones = [
         INSTRUCTION_LOAD, 
@@ -115,17 +120,16 @@ if __name__ == '__main__':
         INSTRUCTION_SHOW
     ]
 
-    pc = int(sys.argv[2])
+    pc = INICIO_INSTRUCCIONES
     icr = None
     mar = pc
     acumulador = 0
     alu = []
+    resultado = None
 
     for i in range(len(get_instruciones_memoria())):
         execute_mdr()
-        execute_control_unit()
+        resultado = execute_control_unit()
         mar = pc
 
-    # print('\n')
-    # print('ESTADO FINAL DE LA MEMORIA RAM: ')
-    # print(data)
+    print(resultado)
