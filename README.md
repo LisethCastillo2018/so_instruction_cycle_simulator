@@ -10,13 +10,4 @@ Practice No. 2: Instruction cycle
 
 ##### Ejecutar el programa:
 
-1) Leyendo datos desde archivo de texto:
-
-`python3 simulador.py <ruta-archivo-ram>`
-
-`python3 simulador.py data/ram-1.txt`
-
-2) Leyendo datos desde linea de comando:
-
-`python3 simulador.py `
-
+`python3 simulador.py`
