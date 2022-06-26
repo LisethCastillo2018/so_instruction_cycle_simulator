@@ -107,33 +107,36 @@ if __name__ == '__main__':
     INSTRUCTION_STORE = 'STR'
     INSTRUCTION_SET = 'SET'
     INSTRUCTION_SHOW = 'SHW'
-
     INICIO_INSTRUCCIONES = 1000
 
-    # Leer el archivo con las instruciones
-    if len(sys.argv) > 1:
-        data = read_file(INICIO_INSTRUCCIONES)
-    else:
-        data = read_input(INICIO_INSTRUCCIONES)
-
-    palabras_instruciones = [
-        INSTRUCTION_LOAD, 
-        INSTRUCTION_ADD, 
-        INSTRUCTION_STORE,
-        INSTRUCTION_SET,
-        INSTRUCTION_SHOW
+    memoria = [
+        'data/programa-1.txt',
+        'data/programa-2.txt'
     ]
 
-    pc = INICIO_INSTRUCCIONES
-    icr = None
-    mar = pc
-    acumulador = 0
-    alu = []
-    resultado = None
+    for programa in memoria:
+        # Leer el archivo con las instruciones
+        data = read_file(INICIO_INSTRUCCIONES, programa)
+        palabras_instruciones = [
+            INSTRUCTION_LOAD, 
+            INSTRUCTION_ADD, 
+            INSTRUCTION_STORE,
+            INSTRUCTION_SET,
+            INSTRUCTION_SHOW
+        ]
 
-    for i in range(len(get_instruciones_memoria())):
-        execute_mdr()
-        resultado = execute_control_unit()
+        pc = INICIO_INSTRUCCIONES
+        icr = None
         mar = pc
+        acumulador = 0
+        alu = []
+        resultado = None
 
-    print(resultado)
+        for i in range(len(get_instruciones_memoria())):
+            execute_mdr()
+            resultado = execute_control_unit()
+            mar = pc
+
+        """ RESULTADO """
+        print(programa)
+        print(resultado)

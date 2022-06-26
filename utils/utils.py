@@ -7,8 +7,7 @@ LISETH DAYANA CASTILLO QUIÑONES, CÓD. 1843187
 import sys
 
 
-def read_file(inicio_instrucciones):
-    ruta_archivo = sys.argv[1]
+def read_file(inicio_instrucciones, ruta_archivo):
     f = open(ruta_archivo,'r')
     datos = procesar_lineas(f.readlines(), inicio_instrucciones)
     f.close()
