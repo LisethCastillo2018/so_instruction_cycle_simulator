@@ -17,12 +17,12 @@ def get_memory_data():
 
 
 """ Obtener todas las instrucciones a ejecutar """
-def get_instruciones_memoria():
-    instrucciones = []
+def get_memory_instructions():
+    instructions = []
     for val in data:
-        if type(val) is dict and val['word'] in palabras_instruciones:
-            instrucciones.append(val['word'])
-    return instrucciones
+        if type(val) is dict and val['word'] in words_instructions:
+            instructions.append(val['word'])
+    return instructions
 
 
 """ Asignar MAR, direccion del dato que se quiere leer """
@@ -32,9 +32,9 @@ def set_mar(var):
 
 
 """ Asignar Acumulador """
-def set_acumulador(val):
-    global acumulador
-    acumulador = int(val)
+def set_accumulator(val):
+    global accumulator
+    accumulator = int(val)
 
 
 """ Asignar ultima funcion ejecutada """
@@ -44,9 +44,9 @@ def set_control_unit(function):
 
 
 """ Almacenar la instrucción que se está ejecutando """
-def execute_icr(instruccion):
+def execute_icr(instruction):
     global icr, pc
-    icr = instruccion
+    icr = instruction
     pc += 1
 
 
@@ -54,9 +54,8 @@ def execute_icr(instruccion):
 def execute_mdr():
     global mdr
     mdr = get_memory_data()
-    # print('**** instruccion: ', instruccion)
     if mdr is not None:
-        if type(mdr) is dict and mdr['word'] in palabras_instruciones:
+        if type(mdr) is dict and mdr['word'] in words_instructions:
             execute_icr(mdr)        
                 
 
@@ -66,7 +65,7 @@ Load the value in 'var' memory address and puts in accumulator register
 def execute_load(var='var1'):
     set_mar(icr[var])
     valor = get_memory_data()
-    set_acumulador(valor)
+    set_accumulator(valor)
     return valor
 
 
@@ -75,7 +74,7 @@ Read the value in accumulator register and puts in 'var' memory address
 """
 def execute_store(var='var1'):
     set_mar(icr[var])
-    data[mar] = acumulador
+    data[mar] = accumulator
 
 
 """
@@ -94,48 +93,48 @@ value in accumulator register. ADD D1 D3 NULL Load the value in D1 memory addres
 register and add to found value in D3 memory address. ADD D1 D3 D4 same that ADD D1 D3 but puts the result in D4
 """
 def execute_add():
-    # print('*** acumulador: ', acumulador)
+    # print('*** accumulator: ', accumulator)
     if icr['var2'] != NULL_VALUE and icr['var3'] != NULL_VALUE:
 
         var1 = execute_load()
         var2 = execute_load('var2')
-        set_acumulador(var1 + var2)
+        set_accumulator(var1 + var2)
         execute_store('var3')
 
     elif icr['var2'] != NULL_VALUE:
     
         var1 = execute_load()
         var2 = execute_load('var2')
-        set_acumulador(var1 + var2)
+        set_accumulator(var1 + var2)
 
     else:
-        valor_acumulador_inicial = acumulador
+        valor_acumulador_inicial = accumulator
         var1 = execute_load()
-        set_acumulador(valor_acumulador_inicial + var1)
+        set_accumulator(valor_acumulador_inicial + var1)
 
 
 """
 SUBTRACTION - There are three ways: SUB D1 NULL NULL, SUB D1 D2 NULL and SUB D3 D2 D1 similar to ADD but perform subtraction.
 """
 def execute_sub():
-    # print('*** acumulador: ', acumulador)
+    # print('*** accumulator: ', accumulator)
     if icr['var2'] != NULL_VALUE and icr['var3'] != NULL_VALUE:
 
         var1 = execute_load()
         var2 = execute_load('var2')
-        set_acumulador(var1 - var2)
+        set_accumulator(var1 - var2)
         execute_store('var3')
 
     elif icr['var2'] != NULL_VALUE:
     
         var1 = execute_load()
         var2 = execute_load('var2')
-        set_acumulador(var1 - var2)
+        set_accumulator(var1 - var2)
 
     else:
-        valor_acumulador_inicial = acumulador
+        valor_acumulador_inicial = accumulator
         var1 = execute_load()
-        set_acumulador(valor_acumulador_inicial - var1)
+        set_accumulator(valor_acumulador_inicial - var1)
 
 
 """
@@ -159,7 +158,7 @@ def execute_mul(var='var1'):
 
     else:
 
-        valor_acumulador_inicial = acumulador
+        valor_acumulador_inicial = accumulator
         # print('*** valor_acumulador_inicial: ', valor_acumulador_inicial)
         for i in range(valor_acumulador_inicial-1):
             if i == 0:
@@ -199,13 +198,13 @@ def execute_div(var='var1'):
 
     else:
 
-        valor_acumulador_inicial = acumulador
+        valor_acumulador_inicial = accumulator
         # print('*** valor_acumulador_inicial: ', valor_acumulador_inicial)
         for i in range(valor_acumulador_inicial-1):
-            if acumulador > 0:
+            if accumulator > 0:
                 execute_sub()
             else:
-                set_acumulador(i)
+                set_accumulator(i)
                 break
 
 
@@ -214,7 +213,7 @@ NCREMENT - INC D3 NULL NULL Load the value in D3 memory address adds 1 and store
 """
 def execute_inc():
     execute_load('var1')
-    set_acumulador(acumulador + 1)
+    set_accumulator(accumulator + 1)
     execute_store('var1')
 
 
@@ -223,7 +222,7 @@ DECREMENT - DEC D3 NULL NULL Load the value in D3 memory address dec 1 and store
 """
 def execute_dec():
     execute_load('var1')
-    set_acumulador(acumulador - 1)
+    set_accumulator(accumulator - 1)
     execute_store('var1')
 
 
@@ -241,31 +240,31 @@ BEQ D10 NULL NULL Load the value in D10 memory address if subtraction with accum
 values is zero puts in D10 memory address. There are three ways: BEQ D10 NULL NULL, BEQ D1 D10 NULL, BEQ D1 D2 D3
 """
 def execute_beq():
-    initial_value_acumulator = acumulador
+    initial_value_acumulator = accumulator
     variables = ['var1', 'var2', 'var3']
     for variable in variables:
         if icr[variable] != NULL_VALUE:
             value = execute_load(variable)
-            diferencia = initial_value_acumulator - value
-            if diferencia == 0:
+            difference = initial_value_acumulator - value
+            if difference == 0:
                 execute_set(0, variable)
-    set_acumulador(initial_value_acumulator)
+    set_accumulator(initial_value_acumulator)
 
 
 """ 
 AND D2 D5 D6 - Carga los valores en las direcciones de memoria (los 3 obligatorios), si cada uno es mayor
-al valor del acumulador, se actualiza el valor del acumulador con el mayor valor
+al valor del accumulator, se actualiza el valor del accumulator con el mayor valor
 """
 def execute_and():
     if icr['var1'] != NULL_VALUE and icr['var2'] != NULL_VALUE and icr['var3'] != NULL_VALUE:
         variables = ['var1', 'var2', 'var3']
-        initial_value_acumulator = acumulador
-        bigger_num = acumulador
+        initial_value_acumulator = accumulator
+        bigger_num = accumulator
         validated = True
 
         for variable in variables:
             value = execute_load(variable)
-            """ Verificar que todos los valores sean mayor al del acumulador """
+            """ Verificar que todos los valores sean mayor al del accumulator """
             if initial_value_acumulator >= value:
                 validated = False
                 break
@@ -274,19 +273,19 @@ def execute_and():
                 bigger_num = value
 
         if validated is False:
-            set_acumulador(initial_value_acumulator)
+            set_accumulator(initial_value_acumulator)
         else:
-            set_acumulador(bigger_num)
+            set_accumulator(bigger_num)
 
 
 """ 
-AND D2 D5 D6 - Carga los valores en las direcciones de memoria, el valor del acumulador 
+AND D2 D5 D6 - Carga los valores en las direcciones de memoria, el valor del accumulator 
 es actualizado con el primer valor que se encuentre que sea mayor a él
 """
 def execute_or():
     variables = ['var1', 'var2', 'var3']
-    initial_value_acumulator = acumulador
-    bigger_num = acumulador
+    initial_value_acumulator = accumulator
+    bigger_num = accumulator
     validated = False
 
     for variable in variables:
@@ -299,9 +298,9 @@ def execute_or():
                 break
 
     if validated is False:
-        set_acumulador(initial_value_acumulator)
+        set_accumulator(initial_value_acumulator)
     else:
-        set_acumulador(bigger_num)
+        set_accumulator(bigger_num)
 
 
 """
@@ -311,7 +310,7 @@ MDR register, SHW UC show the value in Control Unit.
 """
 def execute_print():
     dict_show = {
-        'ACC': acumulador,
+        'ACC': accumulator,
         'ICR': icr,
         'MAR': mar,
         'MDR': mdr,
@@ -331,7 +330,7 @@ def execute_print():
 
 """ Ejecutar unidad de control """
 def execute_control_unit():
-    if icr['word'] in palabras_instruciones:
+    if icr['word'] in words_instructions:
         cu_list = {
             INSTRUCTION_ADD: execute_add,
             INSTRUCTION_SUB: execute_sub,
@@ -378,7 +377,7 @@ if __name__ == '__main__':
     INICIO_INSTRUCCIONES = 1000  # De esta posición en adelante de registran las instrucciones
 
     """ Instrucciones habilitadas para ser leidas """
-    palabras_instruciones = [
+    words_instructions = [
         INSTRUCTION_LOAD, 
         INSTRUCTION_ADD, 
         INSTRUCTION_SUB,
@@ -407,11 +406,11 @@ if __name__ == '__main__':
     mdr = None
     cu = None
     mar = pc
-    acumulador = 0
+    accumulator = 0
     alu = []
 
     """ Ejecutar instrucciones en memoria """
-    for i in range(len(get_instruciones_memoria())):
+    for i in range(len(get_memory_instructions())):
         execute_mdr()
         execute_control_unit()
         mar = pc
