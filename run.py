@@ -61,9 +61,9 @@ def excute_store(var='var1'):
     data[mar] = acumulador
 
 
-def execute_set():
-    position = int(icr['var1'].replace("D",""))
-    data[position] = int(icr['var2'])
+def execute_set(value):
+    set_mar(icr['var1'])
+    data[mar] = value
 
 
 def execute_add():
@@ -172,6 +172,12 @@ def execute_div(var='var1'):
                 break
 
 
+def execute_inc():
+    execute_load('var1')
+    set_acumulador(acumulador + 1)
+    excute_store('var1')
+
+
 def execute_control_unit():
     if icr['word'] in palabras_instruciones:
         if icr['word'] == INSTRUCTION_ADD:
@@ -192,7 +198,7 @@ def execute_control_unit():
 
         elif icr['word'] == INSTRUCTION_SET:
 
-            execute_set()
+            execute_set(int(icr['var2']))
 
         elif icr['word'] == INSTRUCTION_LOAD:
             
@@ -201,6 +207,10 @@ def execute_control_unit():
         elif icr['word'] == INSTRUCTION_STORE:
 
             excute_store()
+
+        elif icr['word'] == INSTRUCTION_INC:
+
+            execute_inc()
 
         elif icr['word'] == INSTRUCTION_SHOW:
             
@@ -231,6 +241,7 @@ if __name__ == '__main__':
     INSTRUCTION_STORE = 'STR'
     INSTRUCTION_SET = 'SET'
     INSTRUCTION_SHOW = 'SHW'
+    INSTRUCTION_INC = 'INC'
 
     INICIO_INSTRUCCIONES = 1000
 
@@ -248,7 +259,8 @@ if __name__ == '__main__':
         INSTRUCTION_DIV,
         INSTRUCTION_STORE,
         INSTRUCTION_SET,
-        INSTRUCTION_SHOW
+        INSTRUCTION_SHOW,
+        INSTRUCTION_INC
     ]
 
     pc = INICIO_INSTRUCCIONES
