@@ -189,6 +189,7 @@ def execute_mov():
     execute_store('var2')
     execute_set(0, 'var1')
 
+
 def execute_beq():
     initial_value_acumulator = acumulador
     variables = ['var1', 'var2', 'var3']
@@ -199,6 +200,7 @@ def execute_beq():
             if diferencia == 0:
                 execute_set(0, variable)
     set_acumulador(initial_value_acumulator)
+
 
 """ 
 AND D2 D5 D6 - Carga los valores en las direcciones de memoria (los 3 obligatorios), si cada uno es mayor
@@ -226,6 +228,7 @@ def execute_and():
         else:
             set_acumulador(bigger_num)
 
+
 """ 
 AND D2 D5 D6 - Carga los valores en las direcciones de memoria, el valor del acumulador 
 es actualizado con el primer valor que se encuentre que sea mayor a él
@@ -249,6 +252,7 @@ def execute_or():
         set_acumulador(initial_value_acumulator)
     else:
         set_acumulador(bigger_num)
+
 
 def execute_print():
     dict_show = {
