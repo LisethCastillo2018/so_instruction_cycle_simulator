@@ -33,6 +33,9 @@ def set_acumulador(val):
     global acumulador
     acumulador = int(val)
 
+def set_control_unit(val):
+    global cu
+    cu = val
 
 def execute_icr(instruccion):
     global icr, pc
@@ -61,8 +64,10 @@ def execute_store(var='var1'):
     data[mar] = acumulador
 
 
-def execute_set(value, var='var1'):
+def execute_set(value=None, var='var1'):
     set_mar(icr[var])
+    if value is None:
+        value = int(icr['var2'])
     data[mar] = value
 
 
@@ -259,7 +264,8 @@ def execute_print():
         'ACC': acumulador,
         'ICR': icr,
         'MAR': mar,
-        'MDR': mdr
+        'MDR': mdr,
+        'UC': cu
     }
     value_show = dict_show.get(icr['var1'], None)
 
@@ -268,68 +274,33 @@ def execute_print():
     else:
         vars_print = ['var1', 'var2', 'var3']
         for var_print in vars_print:
-            if 'D' in icr[var_print] and icr[var_print] not in ['UC']:
+            if 'D' in icr[var_print]:
                 position = int(icr[var_print].replace("D",""))
                 print(data[position])
 
 
 def execute_control_unit():
     if icr['word'] in palabras_instruciones:
-        if icr['word'] == INSTRUCTION_ADD:
-
-            execute_add()
-
-        elif icr['word'] == INSTRUCTION_SUB:
-
-            execute_sub()
-
-        elif icr['word'] == INSTRUCTION_MUL:
-
-            execute_mul()
-
-        elif icr['word'] == INSTRUCTION_DIV:
-    
-            execute_div()
-
-        elif icr['word'] == INSTRUCTION_SET:
-
-            execute_set(int(icr['var2']))
-
-        elif icr['word'] == INSTRUCTION_LOAD:
-            
-            execute_load()
-
-        elif icr['word'] == INSTRUCTION_STORE:
-
-            execute_store()
-
-        elif icr['word'] == INSTRUCTION_INC:
-
-            execute_inc()
-
-        elif icr['word'] == INSTRUCTION_DEC:
-    
-            execute_dec()
-
-        elif icr['word'] == INSTRUCTION_MOV:
-        
-            execute_mov()
-
-        elif icr['word'] == INSTRUCTION_BEQ:
-            
-            execute_beq()
-
-        elif icr['word'] == INSTRUCTION_AND:
-            
-            execute_and()
-
-        elif icr['word'] == INSTRUCTION_OR:
-            
-            execute_or()
-
-        elif icr['word'] == INSTRUCTION_SHOW:
-            
-            execute_print()          
+        cu_list = {
+            INSTRUCTION_ADD: execute_add,
+            INSTRUCTION_SUB: execute_sub,
+            INSTRUCTION_MUL: execute_mul,
+            INSTRUCTION_DIV: execute_div,
+            INSTRUCTION_SET: execute_set,
+            INSTRUCTION_LOAD: execute_load,
+            INSTRUCTION_STORE: execute_store,
+            INSTRUCTION_INC: execute_inc,
+            INSTRUCTION_DEC: execute_dec,
+            INSTRUCTION_MOV: execute_mov,
+            INSTRUCTION_BEQ: execute_beq,
+            INSTRUCTION_AND: execute_and,
+            INSTRUCTION_OR: execute_or,
+            INSTRUCTION_SHOW: execute_print,
+        }
+        function = cu_list.get(icr['word'], None)
+        if function is not None:
+            function()
+            set_control_unit(function)
 
 
 """************ INICIO DEL PROGRAMA ************"""
@@ -380,6 +351,7 @@ if __name__ == '__main__':
     pc = INICIO_INSTRUCCIONES
     icr = None
     mdr = None
+    cu = None
     mar = pc
     acumulador = 0
     alu = []
