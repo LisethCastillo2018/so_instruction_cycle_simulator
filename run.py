@@ -8,6 +8,7 @@ import sys
 from utils.utils import read_file, read_input
 
 
+""" Obtener valor en memoria de MAR """
 def get_memory_data():
     if mar > len(data):
         return None
@@ -15,34 +16,41 @@ def get_memory_data():
         return data[mar]
 
 
+""" Obtener todas las instrucciones a ejecutar """
 def get_instruciones_memoria():
     instrucciones = []
-    # print(data)
     for val in data:
         if type(val) is dict and val['word'] in palabras_instruciones:
             instrucciones.append(val['word'])
     return instrucciones
 
 
+""" Asignar MAR, direccion del dato que se quiere leer """
 def set_mar(var):
     global mar
     mar = int(var.replace("D",""))
 
 
+""" Asignar Acumulador """
 def set_acumulador(val):
     global acumulador
     acumulador = int(val)
 
-def set_control_unit(val):
-    global cu
-    cu = val
 
+""" Asignar ultima funcion ejecutada """
+def set_control_unit(function):
+    global cu
+    cu = function
+
+
+""" Almacenar la instrucción que se está ejecutando """
 def execute_icr(instruccion):
     global icr, pc
     icr = instruccion
     pc += 1
 
 
+""" Ejecutar MDR """
 def execute_mdr():
     global mdr
     mdr = get_memory_data()
@@ -52,6 +60,9 @@ def execute_mdr():
             execute_icr(mdr)        
                 
 
+""" 
+Load the value in 'var' memory address and puts in accumulator register
+"""
 def execute_load(var='var1'):
     set_mar(icr[var])
     valor = get_memory_data()
@@ -59,11 +70,17 @@ def execute_load(var='var1'):
     return valor
 
 
+"""
+Read the value in accumulator register and puts in 'var' memory address
+"""
 def execute_store(var='var1'):
     set_mar(icr[var])
     data[mar] = acumulador
 
 
+"""
+Store 'value' in 'var' memory address. where 'value' is an immediate, direct or constant value.
+"""
 def execute_set(value=None, var='var1'):
     set_mar(icr[var])
     if value is None:
@@ -71,6 +88,11 @@ def execute_set(value=None, var='var1'):
     data[mar] = value
 
 
+"""
+ADDITION - There are three ways: ADD D1 NULL NULL, adds the value in D1 memory address to loaded 
+value in accumulator register. ADD D1 D3 NULL Load the value in D1 memory address in the accumulator 
+register and add to found value in D3 memory address. ADD D1 D3 D4 same that ADD D1 D3 but puts the result in D4
+"""
 def execute_add():
     # print('*** acumulador: ', acumulador)
     if icr['var2'] != NULL_VALUE and icr['var3'] != NULL_VALUE:
@@ -92,6 +114,9 @@ def execute_add():
         set_acumulador(valor_acumulador_inicial + var1)
 
 
+"""
+SUBTRACTION - There are three ways: SUB D1 NULL NULL, SUB D1 D2 NULL and SUB D3 D2 D1 similar to ADD but perform subtraction.
+"""
 def execute_sub():
     # print('*** acumulador: ', acumulador)
     if icr['var2'] != NULL_VALUE and icr['var3'] != NULL_VALUE:
@@ -113,6 +138,10 @@ def execute_sub():
         set_acumulador(valor_acumulador_inicial - var1)
 
 
+"""
+MULTIPLICATION - Using ADD perform multiplication operation. There are three ways: MUL D1 NULL NULL, MUL D1 D2 NULL, 
+MUL D1 D2 D3 similar to ADD and SUB. Multiplication cannot be used with an immediate/direct/constant value.
+"""
 def execute_mul(var='var1'):
 
     if icr['var2'] != NULL_VALUE and icr['var3'] != NULL_VALUE:
@@ -138,6 +167,9 @@ def execute_mul(var='var1'):
             execute_add()
 
 
+"""
+INTEGER DIVISION - Using SUB perform division operation.
+"""
 def execute_div(var='var1'):
     
     if icr['var2'] != NULL_VALUE and icr['var3'] != NULL_VALUE:
@@ -177,24 +209,37 @@ def execute_div(var='var1'):
                 break
 
 
+"""
+NCREMENT - INC D3 NULL NULL Load the value in D3 memory address adds 1 and store in same address
+"""
 def execute_inc():
     execute_load('var1')
     set_acumulador(acumulador + 1)
     execute_store('var1')
 
 
+"""
+DECREMENT - DEC D3 NULL NULL Load the value in D3 memory address dec 1 and store in same address
+"""
 def execute_dec():
     execute_load('var1')
     set_acumulador(acumulador - 1)
     execute_store('var1')
 
 
+"""
+MOVE - MOV D2 D10 NULL Load the value in D2 memory address to D10 memory address and clear D2 address
+"""
 def execute_mov():
     execute_load('var1')
     execute_store('var2')
     execute_set(0, 'var1')
 
 
+"""
+BEQ D10 NULL NULL Load the value in D10 memory address if subtraction with accumulator register 
+values is zero puts in D10 memory address. There are three ways: BEQ D10 NULL NULL, BEQ D1 D10 NULL, BEQ D1 D2 D3
+"""
 def execute_beq():
     initial_value_acumulator = acumulador
     variables = ['var1', 'var2', 'var3']
@@ -259,6 +304,11 @@ def execute_or():
         set_acumulador(bigger_num)
 
 
+"""
+SHOW - SHW D2 NULL NULL show the value in D2 memory address, SHW ACC show the value in accumulator register, 
+SHW ICR show the value in ICR register, SHW MAR show the value in MAR register, SHW MDR show the value in 
+MDR register, SHW UC show the value in Control Unit.
+"""
 def execute_print():
     dict_show = {
         'ACC': acumulador,
@@ -279,6 +329,7 @@ def execute_print():
                 print(data[position])
 
 
+""" Ejecutar unidad de control """
 def execute_control_unit():
     if icr['word'] in palabras_instruciones:
         cu_list = {
@@ -306,7 +357,8 @@ def execute_control_unit():
 """************ INICIO DEL PROGRAMA ************"""
 
 if __name__ == '__main__':
-    # Constantes
+
+    """ Constantes """
     NULL_VALUE = 'NULL'
     INSTRUCTION_LOAD = 'LDR'
     INSTRUCTION_ADD = 'ADD'
@@ -323,14 +375,9 @@ if __name__ == '__main__':
     INSTRUCTION_AND = 'AND'
     INSTRUCTION_OR = 'OR'
 
-    INICIO_INSTRUCCIONES = 1000
+    INICIO_INSTRUCCIONES = 1000  # De esta posición en adelante de registran las instrucciones
 
-    # Leer el archivo con las instruciones
-    if len(sys.argv) > 1:
-        data = read_file(INICIO_INSTRUCCIONES)
-    else:
-        data = read_input(INICIO_INSTRUCCIONES)
-
+    """ Instrucciones habilitadas para ser leidas """
     palabras_instruciones = [
         INSTRUCTION_LOAD, 
         INSTRUCTION_ADD, 
@@ -348,6 +395,13 @@ if __name__ == '__main__':
         INSTRUCTION_OR
     ]
 
+    """ Cargar instrucciones en memoria """
+    if len(sys.argv) > 1:  # Leer instruciones desde archivo de texto
+        data = read_file(INICIO_INSTRUCCIONES)
+    else:
+        data = read_input(INICIO_INSTRUCCIONES)  # Leer instrucciones por linea de comandos
+    
+    """ Variables globales """
     pc = INICIO_INSTRUCCIONES
     icr = None
     mdr = None
@@ -356,6 +410,7 @@ if __name__ == '__main__':
     acumulador = 0
     alu = []
 
+    """ Ejecutar instrucciones en memoria """
     for i in range(len(get_instruciones_memoria())):
         execute_mdr()
         execute_control_unit()
