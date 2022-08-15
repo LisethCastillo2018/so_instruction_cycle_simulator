@@ -68,14 +68,14 @@ def execute_set(value, var='var1'):
 
 def execute_add():
     # print('*** acumulador: ', acumulador)
-    if icr['var2'] != 'NULL' and icr['var3'] != 'NULL':
+    if icr['var2'] != NULL_VALUE and icr['var3'] != NULL_VALUE:
 
         var1 = execute_load()
         var2 = execute_load('var2')
         set_acumulador(var1 + var2)
         execute_store('var3')
 
-    elif icr['var2'] != 'NULL':
+    elif icr['var2'] != NULL_VALUE:
     
         var1 = execute_load()
         var2 = execute_load('var2')
@@ -89,14 +89,14 @@ def execute_add():
 
 def execute_sub():
     # print('*** acumulador: ', acumulador)
-    if icr['var2'] != 'NULL' and icr['var3'] != 'NULL':
+    if icr['var2'] != NULL_VALUE and icr['var3'] != NULL_VALUE:
 
         var1 = execute_load()
         var2 = execute_load('var2')
         set_acumulador(var1 - var2)
         execute_store('var3')
 
-    elif icr['var2'] != 'NULL':
+    elif icr['var2'] != NULL_VALUE:
     
         var1 = execute_load()
         var2 = execute_load('var2')
@@ -110,17 +110,17 @@ def execute_sub():
 
 def execute_mul(var='var1'):
 
-    if icr['var2'] != 'NULL' and icr['var3'] != 'NULL':
+    if icr['var2'] != NULL_VALUE and icr['var3'] != NULL_VALUE:
 
         execute_load('var2')
-        icr['var2'] = 'NULL'
+        icr['var2'] = NULL_VALUE
         execute_mul()
         execute_store('var3')
 
-    elif icr['var2'] != 'NULL' :
+    elif icr['var2'] != NULL_VALUE :
 
         execute_load('var2')
-        icr['var2'] = 'NULL'
+        icr['var2'] = NULL_VALUE
         execute_mul()
 
     else:
@@ -135,7 +135,7 @@ def execute_mul(var='var1'):
 
 def execute_div(var='var1'):
     
-    if icr['var2'] != 'NULL' and icr['var3'] != 'NULL':
+    if icr['var2'] != NULL_VALUE and icr['var3'] != NULL_VALUE:
 
         var1 = icr['var1']
         var2 = icr['var2']
@@ -144,11 +144,11 @@ def execute_div(var='var1'):
         icr['var1'] = var2
 
         execute_load('var2')
-        icr['var2'] = 'NULL'
+        icr['var2'] = NULL_VALUE
         execute_div()
         execute_store('var3')
 
-    elif icr['var2'] != 'NULL' :
+    elif icr['var2'] != NULL_VALUE :
 
         var1 = icr['var1']
         var2 = icr['var2']
@@ -157,7 +157,7 @@ def execute_div(var='var1'):
         icr['var1'] = var2
 
         execute_load('var2')
-        icr['var2'] = 'NULL'
+        icr['var2'] = NULL_VALUE
         execute_div()
 
     else:
@@ -193,12 +193,62 @@ def execute_beq():
     initial_value_acumulator = acumulador
     variables = ['var1', 'var2', 'var3']
     for variable in variables:
-        if icr[variable] != 'NULL':
+        if icr[variable] != NULL_VALUE:
             value = execute_load(variable)
             diferencia = initial_value_acumulator - value
             if diferencia == 0:
                 execute_set(0, variable)
+    set_acumulador(initial_value_acumulator)
 
+""" 
+AND D2 D5 D6 - Carga los valores en las direcciones de memoria (los 3 obligatorios), si cada uno es mayor
+al valor del acumulador, se actualiza el valor del acumulador con el mayor valor
+"""
+def execute_and():
+    if icr['var1'] != NULL_VALUE and icr['var2'] != NULL_VALUE and icr['var3'] != NULL_VALUE:
+        variables = ['var1', 'var2', 'var3']
+        initial_value_acumulator = acumulador
+        bigger_num = acumulador
+        validated = True
+
+        for variable in variables:
+            value = execute_load(variable)
+            """ Verificar que todos los valores sean mayor al del acumulador """
+            if initial_value_acumulator >= value:
+                validated = False
+                break
+            """ Registrar el numero mayor """
+            if value > bigger_num:
+                bigger_num = value
+
+        if validated is False:
+            set_acumulador(initial_value_acumulator)
+        else:
+            set_acumulador(bigger_num)
+
+""" 
+AND D2 D5 D6 - Carga los valores en las direcciones de memoria, el valor del acumulador 
+es actualizado con el primer valor que se encuentre que sea mayor a él
+"""
+def execute_or():
+    variables = ['var1', 'var2', 'var3']
+    initial_value_acumulator = acumulador
+    bigger_num = acumulador
+    validated = False
+
+    for variable in variables:
+        if icr[variable] != NULL_VALUE:
+            value = execute_load(variable)
+            """ Registrar el numero mayor """
+            if value > initial_value_acumulator:
+                bigger_num = value
+                validated = True
+                break
+
+    if validated is False:
+        set_acumulador(initial_value_acumulator)
+    else:
+        set_acumulador(bigger_num)
 
 def execute_print():
     dict_show = {
@@ -265,6 +315,14 @@ def execute_control_unit():
             
             execute_beq()
 
+        elif icr['word'] == INSTRUCTION_AND:
+            
+            execute_and()
+
+        elif icr['word'] == INSTRUCTION_OR:
+            
+            execute_or()
+
         elif icr['word'] == INSTRUCTION_SHOW:
             
             execute_print()          
@@ -274,6 +332,7 @@ def execute_control_unit():
 
 if __name__ == '__main__':
     # Constantes
+    NULL_VALUE = 'NULL'
     INSTRUCTION_LOAD = 'LDR'
     INSTRUCTION_ADD = 'ADD'
     INSTRUCTION_SUB = 'SUB'
@@ -286,6 +345,8 @@ if __name__ == '__main__':
     INSTRUCTION_DEC = 'DEC'
     INSTRUCTION_MOV = 'MOV'
     INSTRUCTION_BEQ = 'BEQ'
+    INSTRUCTION_AND = 'AND'
+    INSTRUCTION_OR = 'OR'
 
     INICIO_INSTRUCCIONES = 1000
 
@@ -307,7 +368,9 @@ if __name__ == '__main__':
         INSTRUCTION_INC,
         INSTRUCTION_DEC,
         INSTRUCTION_MOV,
-        INSTRUCTION_BEQ
+        INSTRUCTION_BEQ,
+        INSTRUCTION_AND,
+        INSTRUCTION_OR
     ]
 
     pc = INICIO_INSTRUCCIONES
