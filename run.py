@@ -177,15 +177,28 @@ def execute_inc():
     set_acumulador(acumulador + 1)
     execute_store('var1')
 
+
 def execute_dec():
     execute_load('var1')
     set_acumulador(acumulador - 1)
     execute_store('var1')
 
+
 def execute_mov():
     execute_load('var1')
     execute_store('var2')
     execute_set(0, 'var1')
+
+def execute_beq():
+    initial_value_acumulator = acumulador
+    variables = ['var1', 'var2', 'var3']
+    for variable in variables:
+        if icr[variable] != 'NULL':
+            value = execute_load(variable)
+            diferencia = initial_value_acumulator - value
+            if diferencia == 0:
+                execute_set(0, variable)
+
 
 def execute_print():
     dict_show = {
@@ -197,7 +210,7 @@ def execute_print():
     value_show = dict_show.get(icr['var1'], None)
 
     if value_show is not None:
-        return value_show
+        print(value_show)
     else:
         vars_print = ['var1', 'var2', 'var3']
         for var_print in vars_print:
@@ -248,6 +261,10 @@ def execute_control_unit():
         
             execute_mov()
 
+        elif icr['word'] == INSTRUCTION_BEQ:
+            
+            execute_beq()
+
         elif icr['word'] == INSTRUCTION_SHOW:
             
             execute_print()          
@@ -268,6 +285,7 @@ if __name__ == '__main__':
     INSTRUCTION_INC = 'INC'
     INSTRUCTION_DEC = 'DEC'
     INSTRUCTION_MOV = 'MOV'
+    INSTRUCTION_BEQ = 'BEQ'
 
     INICIO_INSTRUCCIONES = 1000
 
@@ -288,7 +306,8 @@ if __name__ == '__main__':
         INSTRUCTION_SHOW,
         INSTRUCTION_INC,
         INSTRUCTION_DEC,
-        INSTRUCTION_MOV
+        INSTRUCTION_MOV,
+        INSTRUCTION_BEQ
     ]
 
     pc = INICIO_INSTRUCCIONES
