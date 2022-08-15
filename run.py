@@ -56,13 +56,13 @@ def execute_load(var='var1'):
     return valor
 
 
-def excute_store(var='var1'):
+def execute_store(var='var1'):
     set_mar(icr[var])
     data[mar] = acumulador
 
 
-def execute_set(value):
-    set_mar(icr['var1'])
+def execute_set(value, var='var1'):
+    set_mar(icr[var])
     data[mar] = value
 
 
@@ -73,7 +73,7 @@ def execute_add():
         var1 = execute_load()
         var2 = execute_load('var2')
         set_acumulador(var1 + var2)
-        excute_store('var3')
+        execute_store('var3')
 
     elif icr['var2'] != 'NULL':
     
@@ -94,7 +94,7 @@ def execute_sub():
         var1 = execute_load()
         var2 = execute_load('var2')
         set_acumulador(var1 - var2)
-        excute_store('var3')
+        execute_store('var3')
 
     elif icr['var2'] != 'NULL':
     
@@ -115,7 +115,7 @@ def execute_mul(var='var1'):
         execute_load('var2')
         icr['var2'] = 'NULL'
         execute_mul()
-        excute_store('var3')
+        execute_store('var3')
 
     elif icr['var2'] != 'NULL' :
 
@@ -146,7 +146,7 @@ def execute_div(var='var1'):
         execute_load('var2')
         icr['var2'] = 'NULL'
         execute_div()
-        excute_store('var3')
+        execute_store('var3')
 
     elif icr['var2'] != 'NULL' :
 
@@ -175,7 +175,35 @@ def execute_div(var='var1'):
 def execute_inc():
     execute_load('var1')
     set_acumulador(acumulador + 1)
-    excute_store('var1')
+    execute_store('var1')
+
+def execute_dec():
+    execute_load('var1')
+    set_acumulador(acumulador - 1)
+    execute_store('var1')
+
+def execute_mov():
+    execute_load('var1')
+    execute_store('var2')
+    execute_set(0, 'var1')
+
+def execute_print():
+    dict_show = {
+        'ACC': acumulador,
+        'ICR': icr,
+        'MAR': mar,
+        'MDR': mdr
+    }
+    value_show = dict_show.get(icr['var1'], None)
+
+    if value_show is not None:
+        return value_show
+    else:
+        vars_print = ['var1', 'var2', 'var3']
+        for var_print in vars_print:
+            if 'D' in icr[var_print] and icr[var_print] not in ['UC']:
+                position = int(icr[var_print].replace("D",""))
+                print(data[position])
 
 
 def execute_control_unit():
@@ -206,27 +234,23 @@ def execute_control_unit():
 
         elif icr['word'] == INSTRUCTION_STORE:
 
-            excute_store()
+            execute_store()
 
         elif icr['word'] == INSTRUCTION_INC:
 
             execute_inc()
 
+        elif icr['word'] == INSTRUCTION_DEC:
+    
+            execute_dec()
+
+        elif icr['word'] == INSTRUCTION_MOV:
+        
+            execute_mov()
+
         elif icr['word'] == INSTRUCTION_SHOW:
             
-            dict_show = {
-                'ACC': acumulador,
-                'ICR': icr,
-                'MAR': mar,
-                'MDR': mdr
-            }
-            value_show = dict_show.get(icr['var1'], None)
-
-            if value_show is not None:
-                return value_show
-            elif 'D' in icr['var1'] and icr['var1'] not in ['UC']:
-                position = int(icr['var1'].replace("D",""))
-                return data[position]
+            execute_print()          
 
 
 """************ INICIO DEL PROGRAMA ************"""
@@ -242,6 +266,8 @@ if __name__ == '__main__':
     INSTRUCTION_SET = 'SET'
     INSTRUCTION_SHOW = 'SHW'
     INSTRUCTION_INC = 'INC'
+    INSTRUCTION_DEC = 'DEC'
+    INSTRUCTION_MOV = 'MOV'
 
     INICIO_INSTRUCCIONES = 1000
 
@@ -260,7 +286,9 @@ if __name__ == '__main__':
         INSTRUCTION_STORE,
         INSTRUCTION_SET,
         INSTRUCTION_SHOW,
-        INSTRUCTION_INC
+        INSTRUCTION_INC,
+        INSTRUCTION_DEC,
+        INSTRUCTION_MOV
     ]
 
     pc = INICIO_INSTRUCCIONES
@@ -269,11 +297,8 @@ if __name__ == '__main__':
     mar = pc
     acumulador = 0
     alu = []
-    resultado = None
 
     for i in range(len(get_instruciones_memoria())):
         execute_mdr()
-        resultado = execute_control_unit()
+        execute_control_unit()
         mar = pc
-
-    print(resultado)
