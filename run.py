@@ -93,7 +93,6 @@ value in accumulator register. ADD D1 D3 NULL Load the value in D1 memory addres
 register and add to found value in D3 memory address. ADD D1 D3 D4 same that ADD D1 D3 but puts the result in D4
 """
 def execute_add():
-    # print('*** accumulator: ', accumulator)
     if icr['var2'] != NULL_VALUE and icr['var3'] != NULL_VALUE:
 
         var1 = execute_load()
@@ -108,16 +107,16 @@ def execute_add():
         set_accumulator(var1 + var2)
 
     else:
-        valor_acumulador_inicial = accumulator
+        initial_accumulator_value = accumulator
         var1 = execute_load()
-        set_accumulator(valor_acumulador_inicial + var1)
+        set_accumulator(initial_accumulator_value + var1)
 
 
 """
 SUBTRACTION - There are three ways: SUB D1 NULL NULL, SUB D1 D2 NULL and SUB D3 D2 D1 similar to ADD but perform subtraction.
 """
 def execute_sub():
-    # print('*** accumulator: ', accumulator)
+
     if icr['var2'] != NULL_VALUE and icr['var3'] != NULL_VALUE:
 
         var1 = execute_load()
@@ -132,9 +131,9 @@ def execute_sub():
         set_accumulator(var1 - var2)
 
     else:
-        valor_acumulador_inicial = accumulator
+        initial_accumulator_value = accumulator
         var1 = execute_load()
-        set_accumulator(valor_acumulador_inicial - var1)
+        set_accumulator(initial_accumulator_value - var1)
 
 
 """
@@ -157,10 +156,9 @@ def execute_mul(var='var1'):
         execute_mul()
 
     else:
-
-        valor_acumulador_inicial = accumulator
-        # print('*** valor_acumulador_inicial: ', valor_acumulador_inicial)
-        for i in range(valor_acumulador_inicial-1):
+    
+        initial_accumulator_value = accumulator
+        for i in range(initial_accumulator_value-1):
             if i == 0:
                 execute_load(var)
             execute_add()
@@ -175,10 +173,8 @@ def execute_div(var='var1'):
 
         var1 = icr['var1']
         var2 = icr['var2']
-
         icr['var2'] = var1
         icr['var1'] = var2
-
         execute_load('var2')
         icr['var2'] = NULL_VALUE
         execute_div()
@@ -188,19 +184,15 @@ def execute_div(var='var1'):
 
         var1 = icr['var1']
         var2 = icr['var2']
-
         icr['var2'] = var1
         icr['var1'] = var2
-
         execute_load('var2')
         icr['var2'] = NULL_VALUE
         execute_div()
 
     else:
-
-        valor_acumulador_inicial = accumulator
-        # print('*** valor_acumulador_inicial: ', valor_acumulador_inicial)
-        for i in range(valor_acumulador_inicial-1):
+        initial_accumulator_value = accumulator
+        for i in range(initial_accumulator_value-1):
             if accumulator > 0:
                 execute_sub()
             else:
